@@ -1,98 +1,166 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Billing Application
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A RESTful billing service built with **NestJS** and **TypeScript**. Uses in-memory storage — no database required.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Solution Overview
 
-## Description
+### Billing Rules
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Rule | Implementation |
+|------|---------------|
+| **Monthly Base Fee** | Taken from the currency's `monthlyFeeGbp`, prorated by billing period days ÷ 30 |
+| **Transaction Fees** | £0.10 per transaction exceeding the account's `transactionThreshold` |
+| **Promotional Discount** | Percentage discount applied if billing period start falls within `discountDays` of account creation |
 
-## Project setup
+### Project Structure
 
-```bash
-$ npm install
+```
+src/
+├── currencies/       # Currency management
+├── accounts/         # Account management  
+├── billing/          # Billing calculation logic
+└── main.ts           # App entry point with global validation
 ```
 
-## Compile and run the project
+---
+
+## Getting Started
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
+npm run start
 ```
 
-## Run tests
+Server runs on `http://localhost:3000`
+
+---
+
+## API Endpoints
+
+### POST /currencies
+Add a new currency with its monthly base fee.
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl -X POST http://localhost:3000/currencies \
+  -H "Content-Type: application/json" \
+  -d '{"currency":"GBP","monthlyFeeGbp":10}'
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### GET /currencies
+List all currencies.
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl http://localhost:3000/currencies
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+### POST /accounts
+Create a new customer account.
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+curl -X POST http://localhost:3000/accounts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountId": "acc-001",
+    "currency": "GBP",
+    "transactionThreshold": 100,
+    "discountDays": 30,
+    "discountRate": 20
+  }'
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### GET /accounts
+List all accounts.
 
-## Support
+```bash
+curl http://localhost:3000/accounts
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### GET /accounts/:accountId
+Get a specific account.
 
-## Stay in touch
+```bash
+curl http://localhost:3000/accounts/acc-001
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+### POST /accounts/:accountId/bill
+Calculate the bill for an account.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+curl -X POST http://localhost:3000/accounts/acc-001/bill \
+  -H "Content-Type: application/json" \
+  -d '{
+    "billingPeriodStart": "2026-04-16",
+    "billingPeriodEnd": "2026-05-16",
+    "transactionCount": 150
+  }'
+```
+
+**Response:**
+```json
+{
+  "accountId": "acc-001",
+  "currency": "GBP",
+  "billingPeriodStart": "2026-04-16",
+  "billingPeriodEnd": "2026-05-16",
+  "baseFeeGbp": 10.0,
+  "transactionFeeGbp": 5.0,
+  "discountApplied": true,
+  "discountRate": 20,
+  "discountAmountGbp": 3.0,
+  "totalGbp": 12.0
+}
+```
+
+---
+
+## Example Billing Calculation
+
+Given:
+- Currency: GBP, monthly fee £10
+- Account: threshold 100 transactions, 30-day 20% discount
+- Billing: 30-day period, 150 transactions
+
+| Component | Calculation | Amount |
+|-----------|-------------|--------|
+| Base fee | £10/30 × 30 days | £10.00 |
+| Transaction fee | 50 excess × £0.10 | £5.00 |
+| Subtotal | | £15.00 |
+| Discount (20%) | £15.00 × 20% | -£3.00 |
+| **Total** | | **£12.00** |
+
+---
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests and output JSON results
+npm test -- --json --outputFile=test-results.json
+```
+
+**Test coverage:**
+- Monthly base fee (charge, proration, currency-specific fee)
+- Transaction fees (at threshold, over threshold, zero threshold)
+- Promotional discount (within window, expired, applied to full subtotal)
+- Error handling (unknown account, invalid dates, billing before account creation)
+
+---
+
+## Error Handling
+
+| Scenario | HTTP Status |
+|----------|-------------|
+| Duplicate currency | `409 Conflict` |
+| Duplicate account | `409 Conflict` |
+| Unknown account | `404 Not Found` |
+| Unknown currency | `404 Not Found` |
+| Invalid date format | `400 Bad Request` |
+| End date before start date | `400 Bad Request` |
+| Billing period before account creation | `400 Bad Request` |
+| Invalid payload | `400 Bad Request` |

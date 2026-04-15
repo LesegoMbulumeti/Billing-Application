@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 
@@ -15,5 +15,15 @@ export class AccountsController {
       dto.discountDays,
       dto.discountRate,
     );
+  }
+
+  @Get()
+  findAll() {
+    return this.accountsService.findAll();
+  }
+
+  @Get(':accountId')
+  findOne(@Param('accountId') accountId: string) {
+    return this.accountsService.find(accountId);
   }
 }
