@@ -42,6 +42,10 @@ export class AccountsService {
     return account;
   }
 
+  findAll(): Account[] {
+    return Array.from(this.accounts.values());
+  }
+
   find(accountId: string): Account {
     const account = this.accounts.get(accountId);
     if (!account) {

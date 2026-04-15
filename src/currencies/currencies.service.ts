@@ -24,6 +24,10 @@ export class CurrenciesService {
     return entry;
   }
 
+  findAll(): Currency[] {
+    return Array.from(this.currencies.values());
+  }
+
   find(currency: string): Currency | undefined {
     return this.currencies.get(currency.toUpperCase());
   }

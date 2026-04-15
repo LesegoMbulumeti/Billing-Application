@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body } from '@nestjs/common';
 import { CurrenciesService } from './currencies.service';
 import { AddCurrencyDto } from './dto/add-currency.dto';
 
@@ -9,5 +9,10 @@ export class CurrenciesController {
   @Post()
   add(@Body() dto: AddCurrencyDto) {
     return this.currenciesService.add(dto.currency, dto.monthlyFeeGbp);
+  }
+
+  @Get()
+  findAll() {
+    return this.currenciesService.findAll();
   }
 }

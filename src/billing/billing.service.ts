@@ -39,6 +39,15 @@ export class BillingService {
     }
 
     const account = this.accountsService.find(accountId);
+
+    if (start < account.createdAt) {
+      throw new BadRequestException('billingPeriodStart cannot be before account creation date');
+    }
+
+    if (transactionCount < 0) {
+      throw new BadRequestException('transactionCount cannot be negative');
+    }
+
     const currency = this.currenciesService.find(account.currency)!;
 
     // Base fee — prorated by days in billing period vs 30-day month
